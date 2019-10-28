@@ -1,7 +1,7 @@
 {
-  "name": "sina-biolerplate",
+  "name": "igniter-boilerplate",
   "version": "1.0.0",
-  "description": "express with squelize boilerplate",
+  "description": "express with knex",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
