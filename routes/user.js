@@ -119,8 +119,69 @@ router.post('/login-business', (req,res) => {
         res.send({
             success : false
         })
-        //console.log(err) //uncomment to see err
     })
 })
 
+router.post('/add-description/:id_business', (req,res) => {
+    var business_name = req.body.business_name
+    var domisili = req.body.domisili
+    var description  = req.body.description
+    var id_business = req.params.id_business
+
+    knex('business')
+    .where("id_business", id_business)
+    .update({business_name, domisili, description})
+    .then((newData)=>{
+        res.send({
+            success: true, 
+            id: newData[0]
+        })
+    }).catch(err =>{
+        res.send({
+            success : false
+        })
+        console.log(err)
+    })
+})
+
+router.post('/insert-target/:id_business', (req,res) => {
+    var target = req.body.target
+    var id_business = req.params.id_business
+
+    knex('business')
+    .where("id_business", id_business)
+    .update({target})
+    .then((newData)=>{
+        res.send({
+            success: true, 
+            id: newData[0]
+        })
+    }).catch(err =>{
+        res.send({
+            success : false
+        })
+        console.log(err)
+    })
+})
+
+router.post('/add-record/:id_track', (req,res) => {
+    var target = req.body.target
+    var id_track = req.params.id_track
+    var date = Date()
+
+    knex('business')
+    .where("id_track", id_track)
+    .update({target})
+    .then((newData)=>{
+        res.send({
+            success: true, 
+            id: newData[0]
+        })
+    }).catch(err =>{
+        res.send({
+            success : false
+        })
+        console.log(err)
+    })
+})
 module.exports = router
