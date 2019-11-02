@@ -70,7 +70,6 @@ router.get('/test', (req,res) => {
 //             })
 //         }
 //     })
-
 // })
 
 router.post('/register-business', (req,res) => {
