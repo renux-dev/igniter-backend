@@ -19,6 +19,27 @@ router.get('/test', (req,res) => {
     })
 })
 
+// router.get('/register', (req,res) => {
+//     var username = req.body.username
+//     var password = req.body.password
+//     var email  = req.body.email
+    
+//     knex.select("username").from("Users").where("username", username).then(data => {
+//         if (data.length === 0) {
+//             knex('Users').insert({username,email,password}).then((newUserId) => {
+//                 res.send({
+//                     success: true, 
+//                     id: newUserId[0]
+//                 })
+//             })
+//         }else{
+//             res.send({
+//                 success : false
+//             })
+//         }
+//     })
+// })
+
 // router.post('/login', (req,res) => {
 // // router.post('/login', (req,res) => {
 //         var username = req.body.username
@@ -47,28 +68,6 @@ router.get('/test', (req,res) => {
 //         })
 //         //console.log(err) //uncomment to see err
 //     })
-// })
-
-// router.get('/register', (req,res) => {
-//     var username = req.body.username
-//     var password = req.body.password
-//     var email  = req.body.email
-    
-//     knex.select("username").from("Users").where("username", username).then(data => {
-//         if (data.length === 0) {
-//             knex('Users').insert({username,email,password}).then((newUserId) => {
-//                 res.send({
-//                     success: true, 
-//                     id: newUserId[0]
-//                 })
-//             })
-//         }else{
-//             res.send({
-//                 success : false
-//             })
-//         }
-//     })
-
 // })
 
 module.exports = router
