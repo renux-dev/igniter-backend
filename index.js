@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 const port = process.env.PORT || 3000
 
 // create express app
@@ -7,6 +8,9 @@ const app = express();
 
 // Route Handler
 var IgniterRouter = require('./routes/user');
+
+// Express file upload
+app.use(fileUpload());
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'));
