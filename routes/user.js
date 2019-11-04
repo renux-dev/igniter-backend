@@ -163,14 +163,34 @@ router.post('/insert-target/:id_business', (req,res) => {
     })
 })
 
-router.post('/add-record/:id_track', (req,res) => {
-    var target = req.body.target
-    var id_track = req.params.id_track
-    var date = Date()
+router.post('/add-record/', (req,res) => {
+    var total = req.body.total
+    var month = req.body.month
+    var id_business = req.body.id_business
+    var create_at = knex.fn.now();
 
-    knex('business')
-    .where("id_track", id_track)
-    .update({target})
+    knex('track_record')
+    .insert({id_business, month, create_at, total})
+    .then((newData)=>{
+        res.send({
+            success: true, 
+            id: newData[0]
+        })
+    }).catch(err =>{
+        res.send({
+            success : false
+        })
+        console.log(err)
+    })
+})
+
+router.post('/update-record/:id_track', (req,res) => {
+    var total = req.body.total
+    var id_track = req.params.id_track
+    var create_at = knex.fn.now();
+
+    knex('track_record')
+    .insert({id_track, month, create_at, total})
     .then((newData)=>{
         res.send({
             success: true, 
