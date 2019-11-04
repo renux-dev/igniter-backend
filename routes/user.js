@@ -107,7 +107,7 @@ router.post('/user/login', (req,res) => {
 
 // TODO: Target sudah ada, tapi terkumpul belum dibuat
 router.get('/usaha', (req,res) => {
-    knex('business').select('id_business','business_name','target','domisili', 'description', 'photo').then(data => {
+    knex('business').select('id_business','business_name','target','domisili','terkumpul','description','photo').then(data => {
         // console.log(data)
         res.status(200).send({
             success : true,
