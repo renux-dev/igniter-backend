@@ -20,6 +20,7 @@ router.get('/test', (req,res) => {
     })
 })
 
+// TODO: Email belum di kasih regex
 router.post('/user/register', (req,res) => {
     let {name,email,username,password} = req.body
     
@@ -104,6 +105,23 @@ router.post('/user/login', (req,res) => {
     })
 })
 
+// TODO: Target sudah ada, tapi terkumpul belum dibuat
+router.get('/usaha', (req,res) => {
+    knex('business').select('id_business','business_name','target','domisili', 'description', 'photo').then(data => {
+        // console.log(data)
+        res.status(200).send({
+            success : true,
+            data
+        })
+    }).catch(err => {
+        log.error(err)
+        console.log(err)
+
+        res.status(503).send({
+            success : false
+        })
+    })
+})
 // router.post('/login', (req,res) => {
 // // router.post('/login', (req,res) => {
 //         var username = req.body.username
