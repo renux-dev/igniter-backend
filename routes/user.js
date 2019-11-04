@@ -122,6 +122,43 @@ router.get('/usaha', (req,res) => {
         })
     })
 })
+
+// TODO: Buat created_at di database
+router.post('/user/investment', (req,res) => {
+    let {id_user,id_business,total} = req.body
+
+    function updateTerkumpul(){
+        knex('business').select('terkumpul').where('id_business', id_business).then(data1 => {
+            // console.log(data1[0].terkumpul)
+
+            let terkumpul = total + data1[0].terkumpul
+
+            knex('business').where({'id_business' : id_business}).update({'terkumpul': terkumpul})
+        }).catch(err => {
+            log.error(err)
+            console.log(err)
+
+            res.status(503).send({
+                success : false
+            })
+        })
+    }
+
+    knex('investment').insert({id_user,id_business,total}).then(data => {
+        updateTerkumpul()
+
+        res.status(200).send({
+            success : true
+        })      
+    }).catch(err => {
+        log.error(err)
+        console.log(err)
+
+        res.status(503).send({
+            success : false
+        })
+    })
+})
 // router.post('/login', (req,res) => {
 // // router.post('/login', (req,res) => {
 //         var username = req.body.username
