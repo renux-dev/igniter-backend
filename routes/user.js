@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-var express = require('express');
-var router = express.Router();
-=======
 var express   = require('express');
 var router    = express.Router();
 var log = require('../config/winston');
->>>>>>> 05d449395db98efe09287c7b1f6026aaa1caaa76
 // var moment    = require('moment-timezone');
 
 var knex = require('knex')({
