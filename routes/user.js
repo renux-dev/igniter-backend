@@ -1,5 +1,6 @@
 var express   = require('express');
 var router    = express.Router();
+var log = require('../config/winston');
 // var moment    = require('moment-timezone');
 
 var knex = require('knex')({
@@ -19,26 +20,52 @@ router.get('/test', (req,res) => {
     })
 })
 
-// router.get('/register', (req,res) => {
-//     var username = req.body.username
-//     var password = req.body.password
-//     var email  = req.body.email
+router.post('/user/register', (req,res) => {
+    let {name,email,username,password} = req.body
     
-//     knex.select("username").from("Users").where("username", username).then(data => {
-//         if (data.length === 0) {
-//             knex('Users').insert({username,email,password}).then((newUserId) => {
-//                 res.send({
-//                     success: true, 
-//                     id: newUserId[0]
-//                 })
-//             })
-//         }else{
-//             res.send({
-//                 success : false
-//             })
-//         }
-//     })
-// })
+    knex.select("username").from("user").where("username", username).then(data => {
+        // console.log(data)
+        if(data.length > 0){
+            log.error('Username '+ username + ' Already in Use')
+            console.log('Username '+ username + ' Already in Use')
+
+            res.status(409).send({
+                success : false,
+                message : "Username Already in Use"
+            })
+        }else{
+            knex.from("user").select("email").where("email", email).then(data1 => {
+                // console.log(data1)
+                if(data1.length > 0){
+                    log.error('Email '+ email + ' Already in Use')
+                    console.log('Email '+ email + ' Already in Use')
+
+                    res.status(409).send({
+                        success : false,
+                        message : "Email Already in Use"
+                    })
+                }else{
+                    knex('user').insert({name,email,username,password}).then(data2 => {
+                        // console.log(data2)
+                        knex('user').select('id_user').where('username', username).then(data3 => {
+                            // console.log(data3[0])
+
+                            let idUser = data3[0].id_user
+
+                            res.send({
+                                success: true, 
+                                id: idUser
+                            })
+                        })
+                    }).catch(err => {
+                        log.error(err)
+                        console.log(err)
+                    })
+                }
+            })
+        }
+    })
+})
 
 // router.post('/login', (req,res) => {
 // // router.post('/login', (req,res) => {
