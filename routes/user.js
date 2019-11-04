@@ -52,7 +52,7 @@ router.post('/user/register', (req,res) => {
 
                             let idUser = data3[0].id_user
 
-                            res.send({
+                            res.status(200).send({
                                 success: true, 
                                 id: idUser
                             })
@@ -60,6 +60,43 @@ router.post('/user/register', (req,res) => {
                     }).catch(err => {
                         log.error(err)
                         console.log(err)
+                    })
+                }
+            })
+        }
+    })
+})
+
+router.post('/user/login', (req,res) => {
+    let {username,email,password} = req.body
+
+    knex('user').where('username', username).orWhere('email', email).select('id_user').then(data => {
+        // console.log(data)
+        if(data.length === 0){
+            log.error('Not Found Username or Email in System')
+            console.log('Not Found Username or Email in System')
+
+            res.status(404).send({
+                success: false,
+                message: 'Incorrect Username,email or Password'
+            })
+        }else{
+            knex('user').where('password', password).select('id_user').then(data1 => {
+                // console.log(data1[0].id_user)
+                if(data1.length === 0){
+                    log.error('Password Incorrect')
+                    console.log('Password Incorrect')
+
+                    res.status(404).send({
+                        success: false,
+                        message: 'Incorrect Username,email or Password'
+                    })
+                }else{
+                    let idUser = data1[0].id_user
+                    
+                    res.status(200).send({
+                        success: true,
+                        id: idUser
                     })
                 }
             })
