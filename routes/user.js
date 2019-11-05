@@ -44,7 +44,112 @@ router.get('/business/profile/:id_business', (req, res) => {
         .then(data => {
             console.log(data)
             res.send({
-                success: true
+                success: true,
+                data: data
+            })
+        }).catch(err => {
+            console.log(err)
+            res.send({
+                success: false
+            })
+        })
+})
+router.get('/business/all/:id_business', (req, res) => {
+    var id_business = req.params.id_business
+
+    knex('business')
+        .join('documentation', 'business.id_business', 'documentation.id_business')
+        .select()
+        .where("id_business", id_business)
+        .then(data => {
+            console.log(data)
+            res.send({
+                success: true,
+                data: data
+            })
+        }).catch(err => {
+            console.log(err)
+            res.send({
+                success: false
+            })
+        })
+})
+router.get('/business/documentation/:id_business', (req, res) => {
+    var id_business = req.params.id_business
+
+    knex('documentation')
+        .select()
+        .where("id_business", id_business)
+        .then(data => {
+            console.log(data)
+            res.send({
+                success: true,
+                documentation: data
+            })
+        }).catch(err => {
+            console.log(err)
+            res.send({
+                success: false
+            })
+        })
+})
+router.get('/business/track/:id_business', (req, res) => {
+    var id_business = req.params.id_business
+
+    knex('track_record')
+        .select()
+        .where("id_business", id_business)
+        .then(data => {
+            console.log(data)
+            res.send({
+                success: true,
+                data: data
+            })
+        }).catch(err => {
+            console.log(err)
+            res.send({
+                success: false
+            })
+        })
+})
+router.get('/business/attachment/:id_business', (req, res) => {
+    var id_business = req.params.id_business
+
+    knex('attachment')
+        .select()
+        .where("id_business", id_business)
+        .then(data => {
+            console.log(data)
+            res.send({
+                success: true,
+                data: data
+            })
+        }).catch(err => {
+            console.log(err)
+            res.send({
+                success: false
+            })
+        })
+})
+router.get('/business/investment/:id_business', (req, res) => {
+    var id_business = req.params.id_business
+
+    knex('investment')
+        .select()
+        .where("id_business", id_business)
+        .then(data => {
+            console.log(data)
+            total = 0
+            count = 0
+            data.map(function (index) {
+                total += index.total
+                count += 1
+            })
+            res.send({
+                success: true,
+                // data : data,
+                total: total,
+                count: count
             })
         }).catch(err => {
             console.log(err)
@@ -303,7 +408,7 @@ router.post('/business/login', (req, res) => {
         })
 })
 
-router.post('/business/add-description/:id_business', (req, res) => {
+router.post('/business/addDescription/:id_business', (req, res) => {
     var business_name = req.body.business_name
     var domisili = req.body.domisili
     var description = req.body.description
@@ -326,7 +431,7 @@ router.post('/business/add-description/:id_business', (req, res) => {
         })
 })
 
-router.post('/business/insert-target/:id_business', (req, res) => {
+router.post('/business/insertTarget/:id_business', (req, res) => {
     var target = req.body.target
     var id_business = req.params.id_business
 
@@ -346,7 +451,7 @@ router.post('/business/insert-target/:id_business', (req, res) => {
         })
 })
 
-router.post('/business/add-record/:id_business', (req, res) => {
+router.post('/business/addRecord/:id_business', (req, res) => {
     var total = req.body.total
     var month = req.body.month
     var id_business = req.params.id_business
@@ -368,7 +473,7 @@ router.post('/business/add-record/:id_business', (req, res) => {
         })
 })
 
-router.post('/business/update-record/:id_track', (req, res) => {
+router.post('/business/updateRecord/:id_track', (req, res) => {
     var total = req.body.total
     var id_track = req.params.id_track
     var create_at = knex.fn.now();
@@ -388,7 +493,7 @@ router.post('/business/update-record/:id_track', (req, res) => {
         })
 })
 
-router.post('/business/upload-doc', (req, res) => {
+router.post('/business/addDoc', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -399,7 +504,7 @@ router.post('/business/upload-doc', (req, res) => {
     var id_business = req.body.id_business
     var file = req.files.photo
     var photo = file.name
- 
+
     if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
         file.mv('uploads/documentations/' + photo, (err) => {
             if (err) {
@@ -435,7 +540,7 @@ router.post('/business/upload-doc', (req, res) => {
     }
 })
 
-router.post('business/upload-header/:id_business', (req, res) => {
+router.post('business/uploadHeader/:id_business', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -480,7 +585,7 @@ router.post('business/upload-header/:id_business', (req, res) => {
     }
 })
 
-router.post('business/upload-attach', (req, res) => {
+router.post('business/uploadAttach', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
