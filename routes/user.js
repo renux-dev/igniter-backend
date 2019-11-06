@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var log = require('../config/winston');
-// var moment    = require('moment-timezone');
+var moment = require('moment-timezone');
 
 var knex = require('knex')({
     client: 'mysql',
@@ -510,9 +510,10 @@ router.post('/business/addRecord/:id_business', (req, res) => {
     var total = req.body.total
     var month = req.body.month
     var id_business = req.params.id_business
-    var create_at = knex.fn.now()
+    var create_at = moment().tz('Indonesia').format("YYYY-MM-DD HH:mm:ss")
     var deleted = false
 
+    console.log(create_at)
     knex('track_record')
         .insert({ id_business, month, create_at, total , deleted})
         .then((newData) => {
@@ -532,7 +533,7 @@ router.post('/business/addRecord/:id_business', (req, res) => {
 router.post('/business/updateRecord/:id_track', (req, res) => {
     var total = req.body.total
     var id_track = req.params.id_track
-    var create_at = knex.fn.now();
+    var create_at = moment().tz('Indonesia').format("YYYY-MM-DD HH:mm:ss")
 
     knex('track_record')
         .insert({ id_track, month, create_at, total })
