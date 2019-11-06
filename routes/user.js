@@ -35,26 +35,8 @@ router.get('/test', (req, res) => {
 //             })
 //         })
 // })
-router.get('/business/profile/:id_business', (req, res) => {
-    var id_business = req.params.id_business
 
-    knex('business')
-        .select()
-        .where("id_business", id_business)
-        .then(data => {
-            console.log(data)
-            res.send({
-                success: true,
-                data: data
-            })
-        }).catch(err => {
-            console.log(err)
-            res.send({
-                success: false
-            })
-        })
-})
-router.get('/business/all/:id_business', (req, res) => {
+router.get('/business/profile/:id_business', (req, res) => {
     var id_business = req.params.id_business
 
     knex('business')
@@ -65,21 +47,25 @@ router.get('/business/all/:id_business', (req, res) => {
             knex('documentation')
                 .select()
                 .where("id_business", id_business)
+                .andWhere('deleted', false)
                 .then(docs => {
 
                     knex('track_record')
                         .select()
                         .where("id_business", id_business)
+                        .andWhere('deleted', false)
                         .then(tracks => {
 
                             knex('attachment')
                                 .select()
                                 .where("id_business", id_business)
+                                .andWhere('deleted', false)
                                 .then(attachments => {
 
                                     knex('investment')
                                         .select()
                                         .where("id_business", id_business)
+                                        .andWhere('deleted', false)
                                         .then(investments => {
                                             console.log(profiles)
                                             console.log(docs)
@@ -138,6 +124,7 @@ router.get('/business/documentation/:id_business', (req, res) => {
     knex('documentation')
         .select()
         .where("id_business", id_business)
+        .andWhere('deleted', false)
         .then(data => {
             console.log(data)
             res.send({
@@ -157,6 +144,7 @@ router.get('/business/track/:id_business', (req, res) => {
     knex('track_record')
         .select()
         .where("id_business", id_business)
+        .andWhere('deleted', false)
         .then(data => {
             console.log(data)
             res.send({
@@ -176,6 +164,7 @@ router.get('/business/attachment/:id_business', (req, res) => {
     knex('attachment')
         .select()
         .where("id_business", id_business)
+        .andWhere('deleted', false)
         .then(data => {
             console.log(data)
             res.send({
@@ -195,6 +184,7 @@ router.get('/business/investment/:id_business', (req, res) => {
     knex('investment')
         .select()
         .where("id_business", id_business)
+        .andWhere('deleted', false)
         .then(data => {
             console.log(data)
             total = 0
@@ -417,7 +407,12 @@ router.post('/business/register', (req, res) => {
     var description = req.body.description
     var business_name = req.body.business_name
 
-    knex.select("username", "email").from("business").where("username", username).orWhere("email", email).then(data => {
+    knex.select("username", "email")
+    .from("business")
+    .where("username", username)
+    .orWhere("email", email)
+    .andWhere('deleted', false)
+    .then(data => {
         if (data.length === 0) {
             knex('business')
                 .insert({ username, name, email, password, domisili, business_name, description })
@@ -440,7 +435,9 @@ router.post('/business/login', (req, res) => {
     var password = req.body.password
 
     knex("business")
-        .where("username", username).orWhere("email", username)
+        .where("username", username)
+        .orWhere("email", username)
+        .andWhere('deleted', false)
         .select("id_business", "username", "password")
         .then(data => {
             if (data[0].password == password) {
@@ -513,10 +510,11 @@ router.post('/business/addRecord/:id_business', (req, res) => {
     var total = req.body.total
     var month = req.body.month
     var id_business = req.params.id_business
-    var create_at = knex.fn.now();
+    var create_at = knex.fn.now()
+    var deleted = false
 
     knex('track_record')
-        .insert({ id_business, month, create_at, total })
+        .insert({ id_business, month, create_at, total , deleted})
         .then((newData) => {
             res.send({
                 success: true,
@@ -551,7 +549,7 @@ router.post('/business/updateRecord/:id_track', (req, res) => {
         })
 })
 
-router.post('/business/addDoc', (req, res) => {
+router.post('/business/addDocumentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -562,6 +560,7 @@ router.post('/business/addDoc', (req, res) => {
     var id_business = req.body.id_business
     var file = req.files.photo
     var photo = file.name
+    var deleted = false
 
     if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
         file.mv('uploads/documentations/' + photo, (err) => {
@@ -574,7 +573,7 @@ router.post('/business/addDoc', (req, res) => {
                 })
             } else {
                 knex('documentation')
-                    .insert({ id_business, photo })
+                    .insert({ id_business, photo, deleted })
                     .then((data) => {
                         // console.log(data)
                         res.send({
@@ -654,6 +653,7 @@ router.post('business/uploadAttach', (req, res) => {
     var id_business = req.body.id_business
     var file = req.files.attach
     var attach = file.name
+    var deleted = false
 
     file.mv('uploads/attachments/' + attach, (err) => {
         if (err) {
@@ -663,7 +663,7 @@ router.post('business/uploadAttach', (req, res) => {
             })
         } else {
             knex('attachment')
-                .insert({ id_business: id_business, file: attach })
+                .insert({ id_business: id_business, file: attach , deleted})
                 .then((data) => {
                     console.log(data)
                     res.send({
