@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000
 // create express app
 const app = express();
 app.use(cors())
+
 // Route Handler
 var IgniterRouter = require('./routes/user');
 
