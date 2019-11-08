@@ -282,11 +282,9 @@ router.post('/user/login', (req, res) => {
                     let idUser = data1[0].id_user
                     res.status(200).send({
                         success: true,
-                        user: {
-                            id: idUser,
-                            username: data1[0].username,
-                            name : data1[0].name
-                        }
+                        id: idUser,
+                        username: data1[0].username,
+                        name : data1[0].name
                     })
                 }
             })
@@ -446,11 +444,9 @@ router.post('/business/login', (req, res) => {
                 console.log(data)
                 res.send({
                     success: true,
-                    user : {
-                        id: data[0].id_business,
-                        username: data[0].username,
-                        name: data[0].name
-                    }
+                    id: data[0].id_business,
+                    username: data[0].username,
+                    name: data[0].name
                 })
             } else {
                 log.error('Incorrect username, email or password')
