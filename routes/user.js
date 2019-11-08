@@ -98,11 +98,11 @@ router.get('/business/profile/:id_business', (req, res) => {
                                 .select()
                                 .where("id_business", id_business)
                                 .andWhere('deleted', false)
-                                .then(attachments => {
+                                .then(attach_file => {
 
-                                    attach_file = []
-                                    attachments.map((index) => {
-                                        attach_file.push({
+                                    attachments = []
+                                    attach_file.map((index) => {
+                                        attachments.push({
                                             "id_business": index.id_business,
                                             "id_attachment": index.id_attachment,
                                             "file": index.file,
@@ -135,7 +135,7 @@ router.get('/business/profile/:id_business', (req, res) => {
                                                 profile: profile[0],
                                                 docs,
                                                 track,
-                                                attach_file,
+                                                attachments,
                                                 invest
                                             })
                                         }).catch(err => {
