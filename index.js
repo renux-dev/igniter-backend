@@ -15,13 +15,9 @@ var IgniterRouter = require('./routes/user');
 app.use(fileUpload());
 
 app.set('view engine', 'ejs')
-<<<<<<< HEAD
-app.use('/uploads', express.static('uploads'));
-=======
 // app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static('uploads'));
 
->>>>>>> 8886dbdb1e6e0076755ee559796b5ee79cd36c58
 // parse requests of content-type - application/json
 app.use(bodyParser.json({limit: '50mb'}))
 

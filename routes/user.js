@@ -515,12 +515,8 @@ router.post('/business/login', (req, res) => {
     knex("business")
         .where("username", username)
         .orWhere("email", username)
-<<<<<<< HEAD
-        .select("*")
-=======
         .andWhere('status', false)
         .select("id_business", "username", "password")
->>>>>>> 8886dbdb1e6e0076755ee559796b5ee79cd36c58
         .then(data => {
             if (data[0].password == password) {
                 console.log(data)
