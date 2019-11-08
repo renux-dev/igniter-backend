@@ -66,11 +66,11 @@ router.get('/business/profile/:id_business', (req, res) => {
                 .select()
                 .where("id_business", id_business)
                 .andWhere('deleted', false)
-                .then(docs => {
+                .then(documentations => {
 
-                    documentations = []
-                    docs.map((value) => {
-                        documentations.push({
+                    docs = []
+                    documentations.map((value) => {
+                        docs.push({
                             "id_business": value.id_business,
                             "id_documentation": value.id_documentation,
                             "photo": value.photo,
@@ -132,8 +132,8 @@ router.get('/business/profile/:id_business', (req, res) => {
                                             invest = { "total": total, "investor": count }
                                             res.send({
                                                 success: true,
-                                                profile:profile[0],
-                                                documentations,
+                                                profile: profile[0],
+                                                docs,
                                                 track,
                                                 attach_file,
                                                 invest
@@ -433,21 +433,59 @@ router.post('/user/login', (req, res) => {
 })
 
 // TODO: Target sudah ada, tapi terkumpul belum dibuat
-router.get('/usaha', (req, res) => {
-    knex('business').select('id_business', 'business_name', 'target', 'terkumpul', 'domisili', 'description', 'photo').then(data => {
-        // console.log(data)
-        res.status(200).send({
-            success: true,
-            data
-        })
-    }).catch(err => {
-        log.error(err)
-        console.log(err)
+router.get('/user/return/:id_user', (req, res) => {
+    var id_user = req.params.id_user
+    knex('investment')
+        .select()
+        .where("id_user", id_user)
+        .then(data => {
+            var jumlah = 0
+            data.map(function (index) {
+                jumlah += index.total
+            })
+            knex('business')
+                .select("valuasi")
+                .where("id_business", data[0].id_business)
+                .then(data2 => {
+                    console.log(data2, jumlah)
+                    knex('track_record')
+                        .select("total")
+                        .where("id_business", data[0].id_business)
+                        .andWhere("month", 12)
+                        .then(data3 => {
+                            var tot = 0
+                            if(data3){
+                                tot = data3[0].total
+                            }
+                            var ret = jumlah / data2[0].valuasi * tot
+                            res.status(200).send({
+                                success: true,
+                                return:ret
+                            })
+                        }).catch(err => {
+                            log.error(err)
+                            console.log(err)
 
-        res.status(503).send({
-            success: false
+                            res.status(503).send({
+                                success: false
+                            })
+                        })
+                }).catch(err => {
+                    log.error(err)
+                    console.log(err)
+
+                    res.status(503).send({
+                        success: false
+                    })
+                })
+        }).catch(err => {
+            log.error(err)
+            console.log(err)
+
+            res.status(503).send({
+                success: false
+            })
         })
-    })
 })
 
 // TODO: Buat created_at di database
@@ -492,6 +530,7 @@ router.post('/business/register', (req, res) => {
     var password = req.body.password
     var email = req.body.email
     var name = req.body.name
+    var target = req.body.target
     var valuasi = req.body.valuasi
     var domisili = req.body.domisili
     var description = req.body.description
@@ -506,15 +545,15 @@ router.post('/business/register', (req, res) => {
         .then(data => {
             if (data.length === 0) {
                 knex('business')
-                    .insert({ username, name, email, password, domisili, business_name, description, status, valuasi })
+                    .insert({ username, name, email, password, domisili, business_name, description, status, valuasi, target })
                     .then((newUserId) => {
                         knex('business').select().where('username', username).then(data => {
 
                             res.status(200).send({
                                 success: true,
-                                id:data[0].id_business,
-                                name:data[0].name,
-                                username:data[0].username
+                                id: data[0].id_business,
+                                name: data[0].name,
+                                username: data[0].username
                             })
                         })
                     })
