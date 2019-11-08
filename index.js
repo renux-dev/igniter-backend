@@ -1,10 +1,12 @@
 const express = require('express');
+var cors = require('cors');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const port = process.env.PORT || 3000
 
 // create express app
 const app = express();
+app.use(cors())
 
 // Route Handler
 var IgniterRouter = require('./routes/user');
