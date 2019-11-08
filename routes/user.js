@@ -1,4 +1,5 @@
 var express = require('express');
+var fuzzy = require('fuzzylogic');
 var router = express.Router();
 var log = require('../config/winston');
 var moment = require('moment-timezone');
@@ -138,6 +139,19 @@ router.get('/business/documentation/:id_business', (req, res) => {
             })
         })
 })
+router.post('/user/kuisioner', (req, res) => {
+    var page1 = req.body.page1
+    var page2 = req.body.page2
+    var page3 = req.body.page3
+    var page4 = req.body.page4
+
+    var total = page1 + page2 + page3 + page4
+    console.log(total)
+    var profilling = (total) => {
+        return fuzzylogic.trapezoid(threat, 0, 33, 76, 100);
+    };
+
+})
 router.get('/business/track/:id_business', (req, res) => {
     var id_business = req.params.id_business
 
@@ -146,10 +160,66 @@ router.get('/business/track/:id_business', (req, res) => {
         .where("id_business", id_business)
         .andWhere('deleted', false)
         .then(data => {
-            console.log(data)
+            // console.log(data)
+            arrTotal = [
+                {
+                    "month":"Januari",
+                    "total":0
+                },
+                {
+                    "month":"Februari",
+                    "total":0
+                },
+                {
+                    "month":"Maret",
+                    "total":0
+                },
+                {
+                    "month":"April",
+                    "total":0
+                },
+                {
+                    "month":"Mei",
+                    "total":0
+                },
+                {
+                    "month":"Juni",
+                    "total":0
+                },
+                {
+                    "month":"Juli",
+                    "total":0
+                },
+                {
+                    "month":"Agustus",
+                    "total":0
+                },
+                {
+                    "month":"September",
+                    "total":0
+                },
+                {
+                    "month":"Oktober",
+                    "total":0
+                },
+                {
+                    "month":"November",
+                    "total":0
+                },
+                {
+                    "month":"Desember",
+                    "total":0
+                }
+            ]
+            for (i = 0; i < 12; i++) {
+                if(data[i]){
+                    arrTotal[data[i].month-1].total = data[i].total
+                }
+            }
+            // console.log(arrTotal)
             res.send({
                 success: true,
-                data: data
+                data: arrTotal
             })
         }).catch(err => {
             console.log(err)
@@ -408,26 +478,26 @@ router.post('/business/register', (req, res) => {
     var business_name = req.body.business_name
 
     knex.select("username", "email")
-    .from("business")
-    .where("username", username)
-    .orWhere("email", email)
-    .andWhere('deleted', false)
-    .then(data => {
-        if (data.length === 0) {
-            knex('business')
-                .insert({ username, name, email, password, domisili, business_name, description })
-                .then((newUserId) => {
-                    res.send({
-                        success: true,
-                        id: newUserId
+        .from("business")
+        .where("username", username)
+        .orWhere("email", email)
+        .andWhere('deleted', false)
+        .then(data => {
+            if (data.length === 0) {
+                knex('business')
+                    .insert({ username, name, email, password, domisili, business_name, description })
+                    .then((newUserId) => {
+                        res.send({
+                            success: true,
+                            id: newUserId
+                        })
                     })
+            } else {
+                res.status(404).send({
+                    success: false
                 })
-        } else {
-            res.status(404).send({
-                success: false
-            })
-        }
-    })
+            }
+        })
 })
 
 router.post('/business/login', (req, res) => {
@@ -515,7 +585,7 @@ router.post('/business/addRecord/:id_business', (req, res) => {
 
     console.log(create_at)
     knex('track_record')
-        .insert({ id_business, month, create_at, total , deleted})
+        .insert({ id_business, month, create_at, total, deleted })
         .then((newData) => {
             res.send({
                 success: true,
@@ -664,7 +734,7 @@ router.post('business/uploadAttach', (req, res) => {
             })
         } else {
             knex('attachment')
-                .insert({ id_business: id_business, file: attach , deleted})
+                .insert({ id_business: id_business, file: attach, deleted })
                 .then((data) => {
                     console.log(data)
                     res.send({
