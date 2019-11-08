@@ -44,7 +44,7 @@ router.get('/business/profile/:id_business', (req, res) => {
         .select()
         .where("id_business", id_business)
         .then(profiles => {
-
+            var profile = profiles[0]
             knex('documentation')
                 .select()
                 .where("id_business", id_business)
@@ -57,6 +57,14 @@ router.get('/business/profile/:id_business', (req, res) => {
                         .andWhere('deleted', false)
                         .then(tracks => {
 
+                            arrMonth = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+                            arrTotal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                            for (i = 0; i < 12; i++) {
+                                if (tracks[i]) {
+                                    arrTotal[tracks[i].month - 1] = tracks[i].total
+                                }
+                            }
+                            var track = { arrMonth, arrTotal }
                             knex('attachment')
                                 .select()
                                 .where("id_business", id_business)
@@ -68,9 +76,9 @@ router.get('/business/profile/:id_business', (req, res) => {
                                         .where("id_business", id_business)
                                         .andWhere('deleted', false)
                                         .then(investments => {
-                                            console.log(profiles)
+                                            console.log(profile)
                                             console.log(docs)
-                                            console.log(tracks)
+                                            console.log(track)
                                             console.log(attachments)
                                             console.log(investments)
 
@@ -80,10 +88,10 @@ router.get('/business/profile/:id_business', (req, res) => {
                                                 total += index.total
                                                 count += 1
                                             })
-                                            invest = [{ "total": total, "investor": count }]
+                                            invest = { "total": total, "investor": count }
                                             res.send({
                                                 success: true,
-                                                data: { profiles, docs, tracks, attachments, invest }
+                                                data: { profile, docs, track, attachments, invest }
                                             })
                                         }).catch(err => {
                                             console.log(err)
@@ -119,19 +127,44 @@ router.get('/business/profile/:id_business', (req, res) => {
             })
         })
 })
-router.get('/business/documentation/:id_business', (req, res) => {
-    var id_business = req.params.id_business
+router.get('/business/profile', (req, res) => {
 
-    knex('documentation')
+    knex('business')
         .select()
-        .where("id_business", id_business)
-        .andWhere('deleted', false)
-        .then(data => {
-            console.log(data)
-            res.send({
-                success: true,
-                documentation: data
-            })
+        .where("status", false)
+        .then(profiles => {
+
+            knex('investment')
+                .select()
+                .where('deleted', false)
+                .then(investments => {
+                    console.log(profiles)
+                    console.log(investments)
+                    var invest = []
+
+                    profiles.forEach((prof, i) => {
+                        var total = 0
+                        var count = 0
+                        investments.forEach((inv, j) => {
+                            if (prof.id_business === inv.id_business) {
+                                count += 1
+                                total = inv.total
+                            }
+                        })
+                        invest.push([{ "id_business": prof.id_business, "total": total, "investor": count }])
+                    })
+                    console.log(invest)
+                    res.send({
+                        success: true,
+                        data: { profiles, invest }
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    res.send({
+                        success: false
+                    })
+                })
+
         }).catch(err => {
             console.log(err)
             res.send({
@@ -139,6 +172,26 @@ router.get('/business/documentation/:id_business', (req, res) => {
             })
         })
 })
+// router.get('/business/documentation/:id_business', (req, res) => {
+//     var id_business = req.params.id_business
+
+//     knex('documentation')
+//         .select()
+//         .where("id_business", id_business)
+//         .andWhere('deleted', false)
+//         .then(data => {
+//             console.log(data)
+//             res.send({
+//                 success: true,
+//                 documentation: data
+//             })
+//         }).catch(err => {
+//             console.log(err)
+//             res.send({
+//                 success: false
+//             })
+//         })
+// })
 router.post('/user/kuisioner', (req, res) => {
     var page1 = req.body.page1
     var page2 = req.body.page2
@@ -146,89 +199,88 @@ router.post('/user/kuisioner', (req, res) => {
     var page4 = req.body.page4
 
     var total = page1 + page2 + page3 + page4
-    console.log(total)
+    // console.log(total)
     var profilling = (total) => {
         return fuzzylogic.trapezoid(threat, 0, 33, 76, 100);
     };
 
 })
-router.get('/business/track/:id_business', (req, res) => {
-    var id_business = req.params.id_business
+// router.get('/business/track/:id_business', (req, res) => {
+//     var id_business = req.params.id_business
 
-    knex('track_record')
-        .select()
-        .where("id_business", id_business)
-        .andWhere('deleted', false)
-        .then(data => {
-            // console.log(data)
-            arrMonth = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
-            arrTotal = [0,0,0,0,0,0,0,0,0,0,0,0]
-            for (i = 0; i < 12; i++) {
-                if(data[i]){
-                    arrTotal[data[i].month-1] = data[i].total
-                }
-            }
-            // console.log(arrTotal)
-            res.send({
-                success: true,
-                arrMonth,
-                arrTotal
-            })
-        }).catch(err => {
-            console.log(err)
-            res.send({
-                success: false
-            })
-        })
-})
-router.get('/business/attachment/:id_business', (req, res) => {
-    var id_business = req.params.id_business
+//     knex('track_record')
+//         .select()
+//         .where("id_business", id_business)
+//         .andWhere('deleted', false)
+//         .then(data => {
+//             // console.log(data)
+//             arrMonth = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+//             arrTotal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+//             for (i = 0; i < 12; i++) {
+//                 if (data[i]) {
+//                     arrTotal[data[i].month - 1] = data[i].total
+//                 }
+//             }
+//             console.log(arrTotal)
+//             res.send({
+//                 success: true,
+//                 data: { arrMonth, arrTotal }
+//             })
+//         }).catch(err => {
+//             console.log(err)
+//             res.send({
+//                 success: false
+//             })
+//         })
+// })
+// router.get('/business/attachment/:id_business', (req, res) => {
+//     var id_business = req.params.id_business
 
-    knex('attachment')
-        .select()
-        .where("id_business", id_business)
-        .andWhere('deleted', false)
-        .then(data => {
-            console.log(data)
-            res.send({
-                success: true,
-                data: data
-            })
-        }).catch(err => {
-            console.log(err)
-            res.send({
-                success: false
-            })
-        })
-})
-router.get('/business/investment/:id_business', (req, res) => {
-    var id_business = req.params.id_business
+//     knex('attachment')
+//         .select()
+//         .where("id_business", id_business)
+//         .andWhere('deleted', false)
+//         .then(data => {
+//             console.log(data)
+//             res.send({
+//                 success: true,
+//                 data: data
+//             })
+//         }).catch(err => {
+//             console.log(err)
+//             res.send({
+//                 success: false
+//             })
+//         })
+// })
+// router.get('/business/investment/:id_business', (req, res) => {
+//     var id_business = req.params.id_business
 
-    knex('investment')
-        .select()
-        .where("id_business", id_business)
-        .andWhere('deleted', false)
-        .then(data => {
-            console.log(data)
-            total = 0
-            count = 0
-            data.map(function (index) {
-                total += index.total
-                count += 1
-            })
-            res.send({
-                success: true,
-                // data : data,
-                total: total,
-                count: count
-            })
-        }).catch(err => {
-            console.log(err)
-            res.send({
-                success: false
-            })
-        })
-})
+//     knex('investment')
+//         .select()
+//         .where("id_business", id_business)
+//         .andWhere('deleted', false)
+//         .then(data => {
+//             console.log(data)
+//             total = 0
+//             count = 0
+//             data.map(function (index) {
+//                 total += index.total
+//                 count += 1
+//             })
+//             res.send({
+//                 success: true,
+//                 // data : data,
+//                 total: total,
+//                 count: count
+//             })
+//         }).catch(err => {
+//             console.log(err)
+//             res.send({
+//                 success: false
+//             })
+//         })
+// })
 // TODO: Email belum di kasih regex
 router.post('/user/register', (req, res) => {
     let { name, email, username, password } = req.body
@@ -430,16 +482,17 @@ router.post('/business/register', (req, res) => {
     var domisili = req.body.domisili
     var description = req.body.description
     var business_name = req.body.business_name
+    var status = false
 
     knex.select("username", "email")
         .from("business")
         .where("username", username)
         .orWhere("email", email)
-        .andWhere('deleted', false)
+        .andWhere('status', false)
         .then(data => {
             if (data.length === 0) {
                 knex('business')
-                    .insert({ username, name, email, password, domisili, business_name, description })
+                    .insert({ username, name, email, password, domisili, business_name, description, status })
                     .then((newUserId) => {
                         res.send({
                             success: true,
@@ -448,20 +501,26 @@ router.post('/business/register', (req, res) => {
                     })
             } else {
                 res.status(404).send({
-                    success: false
+                    success: false,
+                    message: "EMAIL or USERNAME already taken !"
                 })
             }
         })
 })
 
 router.post('/business/login', (req, res) => {
-    var username = req.body.username
+    var username = req.body.email
     var password = req.body.password
 
     knex("business")
         .where("username", username)
         .orWhere("email", username)
+<<<<<<< HEAD
         .select("*")
+=======
+        .andWhere('status', false)
+        .select("id_business", "username", "password")
+>>>>>>> 8886dbdb1e6e0076755ee559796b5ee79cd36c58
         .then(data => {
             if (data[0].password == password) {
                 console.log(data)
@@ -489,11 +548,11 @@ router.post('/business/login', (req, res) => {
         })
 })
 
-router.post('/business/addDescription/:id_business', (req, res) => {
+router.put('/business/profile/updateDescription/', (req, res) => {
     var business_name = req.body.business_name
     var domisili = req.body.domisili
     var description = req.body.description
-    var id_business = req.params.id_business
+    var id_business = req.body.id_business
 
     knex('business')
         .where("id_business", id_business)
@@ -512,9 +571,9 @@ router.post('/business/addDescription/:id_business', (req, res) => {
         })
 })
 
-router.post('/business/insertTarget/:id_business', (req, res) => {
+router.post('/business/profile/insertTarget', (req, res) => {
     var target = req.body.target
-    var id_business = req.params.id_business
+    var id_business = req.body.id_business
 
     knex('business')
         .where("id_business", id_business)
@@ -532,10 +591,10 @@ router.post('/business/insertTarget/:id_business', (req, res) => {
         })
 })
 
-router.post('/business/addRecord/:id_business', (req, res) => {
+router.post('/business/profile/addRecord', (req, res) => {
     var total = req.body.total
     var month = req.body.month
-    var id_business = req.params.id_business
+    var id_business = req.body.id_business
     var create_at = moment().tz('Indonesia').format("YYYY-MM-DD HH:mm:ss")
     var deleted = false
 
@@ -556,7 +615,7 @@ router.post('/business/addRecord/:id_business', (req, res) => {
         })
 })
 
-router.post('/business/updateRecord/:id_track', (req, res) => {
+router.put('/business/profile/updateRecord/:id_track', (req, res) => {
     var total = req.body.total
     var id_track = req.params.id_track
     var create_at = moment().tz('Indonesia').format("YYYY-MM-DD HH:mm:ss")
@@ -576,7 +635,7 @@ router.post('/business/updateRecord/:id_track', (req, res) => {
         })
 })
 
-router.post('/business/addDocumentation', (req, res) => {
+router.post('/business/profile/addDocumentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -586,7 +645,7 @@ router.post('/business/addDocumentation', (req, res) => {
 
     var id_business = req.body.id_business
     var file = req.files.photo
-    var photo = file.name
+    var photo = Math.floor(Math.random() * 100000).toString() + ".png"
     var deleted = false
 
     if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
@@ -596,7 +655,8 @@ router.post('/business/addDocumentation', (req, res) => {
                 console.log(err)
                 res.send({
                     success: false,
-                    message: "File is empty !"
+                    message: "File is empty !",
+                    url: "http://localhost:3000/uploads/documentations/" + photo
                 })
             } else {
                 knex('documentation')
@@ -624,7 +684,7 @@ router.post('/business/addDocumentation', (req, res) => {
     }
 })
 
-router.post('business/uploadHeader/:id_business', (req, res) => {
+router.post('business/profile/uploadHeader/:id_business', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -634,7 +694,7 @@ router.post('business/uploadHeader/:id_business', (req, res) => {
 
     var id_business = req.params.id_business
     var file = req.files.img
-    var photo = file.name
+    var photo = Math.floor(Math.random() * 100000).toString() + ".png"
 
     if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
         file.mv('uploads/header/' + photo, (err) => {
@@ -669,7 +729,7 @@ router.post('business/uploadHeader/:id_business', (req, res) => {
     }
 })
 
-router.post('business/uploadAttach', (req, res) => {
+router.post('business/profile/uploadAttach', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -679,7 +739,7 @@ router.post('business/uploadAttach', (req, res) => {
 
     var id_business = req.body.id_business
     var file = req.files.attach
-    var attach = file.name
+    var attach = Math.floor(Math.random() * 100000).toString() + ".png"
     var deleted = false
 
     file.mv('uploads/attachments/' + attach, (err) => {
@@ -708,7 +768,7 @@ router.post('business/uploadAttach', (req, res) => {
 
 })
 
-router.post('/business/deleteRecord/:id_track', (req, res) => {
+router.post('/business/profile/deleteRecord/:id_track', (req, res) => {
     var deleted = true
     var id_track = req.params.id_track
 
@@ -728,7 +788,7 @@ router.post('/business/deleteRecord/:id_track', (req, res) => {
         })
 })
 
-router.post('/business/deleteAttach/:id_attachment', (req, res) => {
+router.post('/business/profile/deleteAttach/:id_attachment', (req, res) => {
     var deleted = true
     var id_attachment = req.params.id_attachment
 
@@ -748,7 +808,7 @@ router.post('/business/deleteAttach/:id_attachment', (req, res) => {
         })
 })
 
-router.post('/business/deleteDoc/:id_documentation', (req, res) => {
+router.delete('/business/profile/deleteDoc/:id_documentation', (req, res) => {
     var deleted = true
     var id_documentation = req.params.id_documentation
 
@@ -767,4 +827,25 @@ router.post('/business/deleteDoc/:id_documentation', (req, res) => {
             console.log(err)
         })
 })
+
+router.delete('/business/profile/deleteAttach/:id_attachment', (req, res) => {
+    var id_attachment = req.params.id_attachment
+    var deleted = true
+    knex('attachment')
+        .where("id_attachment", id_attachment)
+        .update({ deleted })
+        .then((newData) => {
+            res.send({
+                success: true,
+                id: newData[0]
+            })
+        }).catch(err => {
+            console.log(err)
+            log.error(err)
+            res.status(404).send({
+                success: false
+            })
+        })
+})
+
 module.exports = router
