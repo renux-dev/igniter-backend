@@ -161,65 +161,17 @@ router.get('/business/track/:id_business', (req, res) => {
         .andWhere('deleted', false)
         .then(data => {
             // console.log(data)
-            arrTotal = [
-                {
-                    "month":"Januari",
-                    "total":0
-                },
-                {
-                    "month":"Februari",
-                    "total":0
-                },
-                {
-                    "month":"Maret",
-                    "total":0
-                },
-                {
-                    "month":"April",
-                    "total":0
-                },
-                {
-                    "month":"Mei",
-                    "total":0
-                },
-                {
-                    "month":"Juni",
-                    "total":0
-                },
-                {
-                    "month":"Juli",
-                    "total":0
-                },
-                {
-                    "month":"Agustus",
-                    "total":0
-                },
-                {
-                    "month":"September",
-                    "total":0
-                },
-                {
-                    "month":"Oktober",
-                    "total":0
-                },
-                {
-                    "month":"November",
-                    "total":0
-                },
-                {
-                    "month":"Desember",
-                    "total":0
-                }
-            ]
+            arrMonth = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+            arrTotal = [0,0,0,0,0,0,0,0,0,0,0,0]
             for (i = 0; i < 12; i++) {
                 if(data[i]){
-                    arrTotal[data[i].month-1].total = data[i].total
+                    arrTotal[data[i].month-1] = data[i].total
                 }
             }
-            // console.log(arrTotal)
+            console.log(arrTotal)
             res.send({
                 success: true,
-                data: arrTotal
+                data: {arrMonth, arrTotal}
             })
         }).catch(err => {
             console.log(err)
