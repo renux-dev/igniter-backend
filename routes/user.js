@@ -119,6 +119,84 @@ router.get('/business/profile/:id_business', (req, res) => {
             })
         })
 })
+router.get('/business/profile', (req, res) => {
+
+    knex('business')
+        .select()
+        .where("status", false)
+        .then(profiles => {
+
+            knex('documentation')
+                .select()
+                .where('deleted', false)
+                //TODO: id_business kebawah
+                .then(docs => {
+
+                    knex('track_record')
+                        .select()
+                        .where('deleted', false)
+                        .then(tracks => {
+
+                            knex('attachment')
+                                .select()
+                                .where('deleted', false)
+                                .then(attachments => {
+
+                                    knex('investment')
+                                        .select()
+                                        .where('deleted', false)
+                                        .then(investments => {
+                                            console.log(profiles)
+                                            console.log(docs)
+                                            console.log(tracks)
+                                            console.log(attachments)
+                                            console.log(investments)
+
+                                            total = 0
+                                            count = 0
+                                            investments.map(function (index) {
+                                                total += index.total
+                                                count += 1
+                                            })
+                                            invest = [{ "total": total, "investor": count }]
+                                            res.send({
+                                                success: true,
+                                                data: { profiles, docs, tracks, attachments, invest }
+                                            })
+                                        }).catch(err => {
+                                            console.log(err)
+                                            res.send({
+                                                success: false
+                                            })
+                                        })
+
+                                }).catch(err => {
+                                    console.log(err)
+                                    res.send({
+                                        success: false
+                                    })
+                                })
+
+                        }).catch(err => {
+                            console.log(err)
+                            res.send({
+                                success: false
+                            })
+                        })
+                }).catch(err => {
+                    console.log(err)
+                    res.send({
+                        success: false
+                    })
+                })
+
+        }).catch(err => {
+            console.log(err)
+            res.send({
+                success: false
+            })
+        })
+})
 router.get('/business/documentation/:id_business', (req, res) => {
     var id_business = req.params.id_business
 
@@ -146,7 +224,7 @@ router.post('/user/kuisioner', (req, res) => {
     var page4 = req.body.page4
 
     var total = page1 + page2 + page3 + page4
-    console.log(total)
+    // console.log(total)
     var profilling = (total) => {
         return fuzzylogic.trapezoid(threat, 0, 33, 76, 100);
     };
@@ -582,7 +660,7 @@ router.post('/business/addDocumentation', (req, res) => {
 
     var id_business = req.body.id_business
     var file = req.files.photo
-    var photo = file.name
+    var photo = Math.floor(Math.random() * 100000).toString()+".png"
     var deleted = false
 
     if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
@@ -592,7 +670,8 @@ router.post('/business/addDocumentation', (req, res) => {
                 console.log(err)
                 res.send({
                     success: false,
-                    message: "File is empty !"
+                    message: "File is empty !",
+                    url : "http://localhost:3000/uploads/documentations/"+photo
                 })
             } else {
                 knex('documentation')
@@ -630,7 +709,7 @@ router.post('business/uploadHeader/:id_business', (req, res) => {
 
     var id_business = req.params.id_business
     var file = req.files.img
-    var photo = file.name
+    var photo = Math.floor(Math.random() * 100000).toString()+".png"
 
     if (file.mimetype == "image/jpeg" || file.mimetype == "image/png") {
         file.mv('uploads/header/' + photo, (err) => {
@@ -675,7 +754,7 @@ router.post('business/uploadAttach', (req, res) => {
 
     var id_business = req.body.id_business
     var file = req.files.attach
-    var attach = file.name
+    var attach = Math.floor(Math.random() * 100000).toString()+".png"
     var deleted = false
 
     file.mv('uploads/attachments/' + attach, (err) => {
