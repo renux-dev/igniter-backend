@@ -343,8 +343,8 @@ router.post('/user/login', (req, res) => {
                 message: 'Incorrect Username,email or Password'
             })
         } else {
-            knex('user').where('password', password).select('id_user').then(data1 => {
-                // console.log(data1[0].id_user)
+            knex('user').where('password', password).select('*').then(data1 => {
+                // console.log(data1)
                 if (data1.length === 0) {
                     log.error('Password Incorrect')
                     console.log('Password Incorrect')
@@ -355,10 +355,11 @@ router.post('/user/login', (req, res) => {
                     })
                 } else {
                     let idUser = data1[0].id_user
-
                     res.status(200).send({
                         success: true,
-                        id: idUser
+                        id: idUser,
+                        username: data1[0].username,
+                        name : data1[0].name
                     })
                 }
             })
@@ -518,9 +519,12 @@ router.post('/business/login', (req, res) => {
         .select("id_business", "username", "password")
         .then(data => {
             if (data[0].password == password) {
+                console.log(data)
                 res.send({
                     success: true,
-                    data: { id: data[0].id_business }
+                    id: data[0].id_business,
+                    username: data[0].username,
+                    name: data[0].name
                 })
             } else {
                 log.error('Incorrect username, email or password')
@@ -530,7 +534,6 @@ router.post('/business/login', (req, res) => {
                     message: 'Incorrect Username,email or Password'
                 })
             }
-            // }
         }).catch(err => {
             log.error('GAGAL LOGIN')
             res.status(404).send({
@@ -629,7 +632,7 @@ router.put('/business/profile/updateRecord/:id_track', (req, res) => {
 
 router.post('/business/profile/addDocumentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
-        res.status(400).send({
+        res.status(404).send({
             success: false,
             message: "File not found !"
         });
