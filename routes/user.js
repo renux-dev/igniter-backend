@@ -44,12 +44,23 @@ router.get('/business/profile/:id_business', (req, res) => {
         .select()
         .where("id_business", id_business)
         .then(profiles => {
-            var profile = profiles[0]
+
             knex('documentation')
                 .select()
                 .where("id_business", id_business)
                 .andWhere('deleted', false)
                 .then(docs => {
+
+                    documentations = []
+                    docs.map((value) => {
+                        documentations.push({
+                            "id_business": value.id_business,
+                            "id_documentation": value.id_documentation,
+                            "photo": value.photo,
+                            "deleted": value.deleted,
+                            "url": "localhost:3000/uploads/attachments/" +value.photo
+                        })
+                    })
 
                     knex('track_record')
                         .select()
@@ -65,22 +76,34 @@ router.get('/business/profile/:id_business', (req, res) => {
                                 }
                             }
                             var track = { arrMonth, arrTotal }
+
                             knex('attachment')
                                 .select()
                                 .where("id_business", id_business)
                                 .andWhere('deleted', false)
                                 .then(attachments => {
 
+                                    attach_file = []
+                                    attachments.map((index) => {
+                                        attach_file.push({
+                                            "id_business": index.id_business,
+                                            "id_attachment": index.id_attachment,
+                                            "file": index.file,
+                                            "deleted": index.deleted,
+                                            "url": "localhost:3000/uploads/attachments/" + index.file
+                                        })
+                                    })
+
                                     knex('investment')
                                         .select()
                                         .where("id_business", id_business)
                                         .andWhere('deleted', false)
                                         .then(investments => {
-                                            console.log(profile)
-                                            console.log(docs)
-                                            console.log(track)
-                                            console.log(attachments)
-                                            console.log(investments)
+                                            // console.log(profile)
+                                            // console.log(docs)
+                                            // console.log(track)
+                                            // console.log(attachments)
+                                            // console.log(investments)
 
                                             total = 0
                                             count = 0
@@ -88,18 +111,16 @@ router.get('/business/profile/:id_business', (req, res) => {
                                                 total += index.total
                                                 count += 1
                                             })
+
                                             invest = { "total": total, "investor": count }
                                             res.send({
                                                 success: true,
-                                                data: { profile, docs, track, attachments, invest }
+                                                profile:profiles[0], 
+                                                documentations, 
+                                                track, 
+                                                attach_file, 
+                                                invest 
                                             })
-                                        }).catch(err => {
-                                            console.log(err)
-                                            res.send({
-                                                success: false
-                                            })
-                                        })
-
                                 }).catch(err => {
                                     console.log(err)
                                     res.send({
@@ -113,19 +134,26 @@ router.get('/business/profile/:id_business', (req, res) => {
                                 success: false
                             })
                         })
+
                 }).catch(err => {
                     console.log(err)
                     res.send({
                         success: false
                     })
                 })
-
         }).catch(err => {
             console.log(err)
             res.send({
                 success: false
             })
         })
+
+}).catch(err => {
+    console.log(err)
+    res.send({
+        success: false
+    })
+})
 })
 router.get('/business/profile', (req, res) => {
 
@@ -138,8 +166,8 @@ router.get('/business/profile', (req, res) => {
                 .select()
                 .where('deleted', false)
                 .then(investments => {
-                    console.log(profiles)
-                    console.log(investments)
+                    // console.log(profiles)
+                    // console.log(investments)
                     var invest = []
 
                     profiles.forEach((prof, i) => {
@@ -151,12 +179,13 @@ router.get('/business/profile', (req, res) => {
                                 total = inv.total
                             }
                         })
-                        invest.push([{ "id_business": prof.id_business, "total": total, "investor": count }])
+                        invest.push({ "id_business": prof.id_business, "total": total, "investor": count })
                     })
-                    console.log(invest)
+                    // console.log(invest)
                     res.send({
                         success: true,
-                        data: { profiles, invest }
+                        profiles, 
+                        invest
                     })
                 }).catch(err => {
                     console.log(err)
@@ -164,7 +193,6 @@ router.get('/business/profile', (req, res) => {
                         success: false
                     })
                 })
-
         }).catch(err => {
             console.log(err)
             res.send({
@@ -359,7 +387,7 @@ router.post('/user/login', (req, res) => {
                         success: true,
                         id: idUser,
                         username: data1[0].username,
-                        name : data1[0].name
+                        name: data1[0].name
                     })
                 }
             })
@@ -421,58 +449,6 @@ router.post('/user/investment', (req, res) => {
         })
     })
 })
-// router.post('/login', (req,res) => {
-// // router.post('/login', (req,res) => {
-//         var username = req.body.username
-//         var password = req.body.password
-
-//         knex('investor, ').where({
-//             username: username
-//         }).select('id','username','password').then(data =>{
-//             // if(data[0][2] !== password){
-//             //     console.log(data[0][0])
-//             if(data[0].password == password){
-//                 res.send({
-//                     success : true,
-//                     data : {id : data[0].id}
-//                 })
-//             }else{
-//                 console.log('gagal')
-//                 res.send({
-//                     success : false
-//                 })
-//             }
-//         // }
-//     }).catch(err => {
-//         res.send({
-//             success : false
-//         })
-//         //console.log(err) //uncomment to see err
-//     })
-// })
-
-// router.get('/register', (req,res) => {
-//     var username = req.body.username
-//     var password = req.body.password
-//     var email  = req.body.email
-//     var name  = req.body.name
-
-
-//     knex.select("username").from("business").where("username", username).then(data => {
-//         if (data.length === 0) {
-//             knex('Users').insert({username,name,email,password}).then((newUserId) => {
-//                 res.send({
-//                     success: true, 
-//                     id: newUserId[0]
-//                 })
-//             })
-//         }else{
-//             res.send({
-//                 success : false
-//             })
-//         }
-//     })
-// })
 
 router.post('/business/register', (req, res) => {
     var username = req.body.username
@@ -534,7 +510,6 @@ router.post('/business/login', (req, res) => {
                     message: 'Incorrect Username,email or Password'
                 })
             }
-            // }
         }).catch(err => {
             log.error('GAGAL LOGIN')
             res.status(404).send({
@@ -611,13 +586,16 @@ router.post('/business/profile/addRecord', (req, res) => {
         })
 })
 
-router.put('/business/profile/updateRecord/:id_track', (req, res) => {
+router.put('/business/profile/updateRecord/', (req, res) => {
     var total = req.body.total
-    var id_track = req.params.id_track
+    var id_business = req.body.id_business
     var create_at = moment().tz('Indonesia').format("YYYY-MM-DD HH:mm:ss")
+    var month = req.body.month
 
     knex('track_record')
-        .insert({ id_track, month, create_at, total })
+        .where("month", month)
+        .andWhere("id_business", id_business)
+        .update({ month, create_at, total })
         .then((newData) => {
             res.send({
                 success: true,
@@ -633,7 +611,7 @@ router.put('/business/profile/updateRecord/:id_track', (req, res) => {
 
 router.post('/business/profile/addDocumentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
-        res.status(400).send({
+        res.status(404).send({
             success: false,
             message: "File not found !"
         });
@@ -652,7 +630,7 @@ router.post('/business/profile/addDocumentation', (req, res) => {
                 res.send({
                     success: false,
                     message: "File is empty !",
-                    url: "http://localhost:3000/uploads/documentations/" + photo
+                    url: "https://igniter.herokuapp.com/uploads/documentations/" + photo
                 })
             } else {
                 knex('documentation')
@@ -706,7 +684,8 @@ router.post('business/profile/uploadHeader/:id_business', (req, res) => {
                     .then((data) => {
                         console.log(data)
                         res.send({
-                            status: true
+                            status: true,
+                            url: "https://igniter.herokuapp.com/uploads/documentations/" + photo
                         })
                     }).catch(err => {
                         console.log(err)
@@ -725,7 +704,7 @@ router.post('business/profile/uploadHeader/:id_business', (req, res) => {
     }
 })
 
-router.post('business/profile/uploadAttach', (req, res) => {
+router.post('/business/profile/uploadAttach', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -735,8 +714,9 @@ router.post('business/profile/uploadAttach', (req, res) => {
 
     var id_business = req.body.id_business
     var file = req.files.attach
-    var attach = Math.floor(Math.random() * 100000).toString() + ".png"
+    var attach = file.name
     var deleted = false
+    console.log(attach)
 
     file.mv('uploads/attachments/' + attach, (err) => {
         if (err) {
@@ -750,7 +730,8 @@ router.post('business/profile/uploadAttach', (req, res) => {
                 .then((data) => {
                     console.log(data)
                     res.send({
-                        status: true
+                        status: true,
+                        url: "https://igniter.herokuapp.com/uploads/attachments/" + attach
                     })
                 }).catch(err => {
                     console.log(err)
