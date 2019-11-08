@@ -44,7 +44,7 @@ router.get('/business/profile/:id_business', (req, res) => {
         .select()
         .where("id_business", id_business)
         .then(profiles => {
-
+            var profile = profiles[0]
             knex('documentation')
                 .select()
                 .where("id_business", id_business)
@@ -76,7 +76,7 @@ router.get('/business/profile/:id_business', (req, res) => {
                                         .where("id_business", id_business)
                                         .andWhere('deleted', false)
                                         .then(investments => {
-                                            console.log(profiles)
+                                            console.log(profile)
                                             console.log(docs)
                                             console.log(track)
                                             console.log(attachments)
@@ -88,10 +88,10 @@ router.get('/business/profile/:id_business', (req, res) => {
                                                 total += index.total
                                                 count += 1
                                             })
-                                            invest = [{ "total": total, "investor": count }]
+                                            invest = { "total": total, "investor": count }
                                             res.send({
                                                 success: true,
-                                                data: { profiles, docs, track, attachments, invest }
+                                                data: { profile, docs, track, attachments, invest }
                                             })
                                         }).catch(err => {
                                             console.log(err)
