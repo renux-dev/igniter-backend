@@ -492,7 +492,8 @@ router.post('/business/register', (req, res) => {
                     })
             } else {
                 res.status(404).send({
-                    success: false
+                    success: false,
+                    message : "EMAIL or USERNAME already taken !"
                 })
             }
         })
@@ -531,11 +532,11 @@ router.post('/business/login', (req, res) => {
         })
 })
 
-router.post('/business/addDescription/:id_business', (req, res) => {
+router.put('/business/updateDescription/', (req, res) => {
     var business_name = req.body.business_name
     var domisili = req.body.domisili
     var description = req.body.description
-    var id_business = req.params.id_business
+    var id_business = req.body.id_business
 
     knex('business')
         .where("id_business", id_business)
@@ -554,9 +555,9 @@ router.post('/business/addDescription/:id_business', (req, res) => {
         })
 })
 
-router.post('/business/insertTarget/:id_business', (req, res) => {
+router.post('/business/insertTarget', (req, res) => {
     var target = req.body.target
-    var id_business = req.params.id_business
+    var id_business = req.body.id_business
 
     knex('business')
         .where("id_business", id_business)
@@ -598,7 +599,7 @@ router.post('/business/addRecord', (req, res) => {
         })
 })
 
-router.post('/business/updateRecord/:id_track', (req, res) => {
+router.put('/business/updateRecord/:id_track', (req, res) => {
     var total = req.body.total
     var id_track = req.params.id_track
     var create_at = moment().tz('Indonesia').format("YYYY-MM-DD HH:mm:ss")
@@ -791,7 +792,7 @@ router.post('/business/deleteAttach/:id_attachment', (req, res) => {
         })
 })
 
-router.post('/business/deleteDoc/:id_documentation', (req, res) => {
+router.delete('/business/deleteDoc/:id_documentation', (req, res) => {
     var deleted = true
     var id_documentation = req.params.id_documentation
 
@@ -810,4 +811,25 @@ router.post('/business/deleteDoc/:id_documentation', (req, res) => {
             console.log(err)
         })
 })
+
+router.delete('/business/deleteAttach/:id_attachment', (req, res) => {
+    var id_attachment = req.params.id_attachment
+    var deleted = true
+    knex('attachment')
+        .where("id_attachment", id_attachment)
+        .update({ deleted })
+        .then((newData) => {
+            res.send({
+                success: true,
+                id: newData[0]
+            })
+        }).catch(err => {
+            console.log(err)
+            log.error(err)
+            res.status(404).send({
+                success: false
+            })
+        })
+})
+
 module.exports = router
