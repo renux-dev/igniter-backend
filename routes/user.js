@@ -508,13 +508,13 @@ router.post('/business/register', (req, res) => {
 })
 
 router.post('/business/login', (req, res) => {
-    var username = req.body.username
+    var username = req.body.email
     var password = req.body.password
 
     knex("business")
         .where("username", username)
         .orWhere("email", username)
-        .andWhere('deleted', false)
+        .andWhere('status', false)
         .select("id_business", "username", "password")
         .then(data => {
             if (data[0].password == password) {
