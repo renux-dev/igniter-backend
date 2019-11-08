@@ -44,7 +44,24 @@ router.get('/business/profile/:id_business', (req, res) => {
         .select()
         .where("id_business", id_business)
         .then(profiles => {
-
+            profile = []
+            profiles.map((value) => {
+                profile.push({
+                    "id_business": value.id_business,
+                    "username": value.username,
+                    "name": value.name,
+                    "email": value.email,
+                    "password": value.password,
+                    "business_name": value.business_name,
+                    "target": value.target,
+                    "domisili": value.domisili,
+                    "description": value.description,
+                    "photo": value.photo,
+                    "status": value.status,
+                    "valuasi": value.valuasi,
+                    "url": "https://igniter.herokuapp.com/uploads/header/" + value.photo
+                })
+            })
             knex('documentation')
                 .select()
                 .where("id_business", id_business)
@@ -58,7 +75,7 @@ router.get('/business/profile/:id_business', (req, res) => {
                             "id_documentation": value.id_documentation,
                             "photo": value.photo,
                             "deleted": value.deleted,
-                            "url": "localhost:3000/uploads/attachments/" +value.photo
+                            "url": "https://igniter.herokuapp.com/uploads/attachments/" + value.photo
                         })
                     })
 
@@ -90,7 +107,7 @@ router.get('/business/profile/:id_business', (req, res) => {
                                             "id_attachment": index.id_attachment,
                                             "file": index.file,
                                             "deleted": index.deleted,
-                                            "url": "localhost:3000/uploads/attachments/" + index.file
+                                            "url": "https://igniter.herokuapp.com/uploads/attachments/" + index.file
                                         })
                                     })
 
@@ -115,12 +132,19 @@ router.get('/business/profile/:id_business', (req, res) => {
                                             invest = { "total": total, "investor": count }
                                             res.send({
                                                 success: true,
-                                                profile:profiles[0], 
-                                                documentations, 
-                                                track, 
-                                                attach_file, 
-                                                invest 
+                                                profile:profile[0],
+                                                documentations,
+                                                track,
+                                                attach_file,
+                                                invest
                                             })
+                                        }).catch(err => {
+                                            console.log(err)
+                                            res.send({
+                                                success: false
+                                            })
+                                        })
+
                                 }).catch(err => {
                                     console.log(err)
                                     res.send({
@@ -134,26 +158,19 @@ router.get('/business/profile/:id_business', (req, res) => {
                                 success: false
                             })
                         })
-
                 }).catch(err => {
                     console.log(err)
                     res.send({
                         success: false
                     })
                 })
+
         }).catch(err => {
             console.log(err)
             res.send({
                 success: false
             })
         })
-
-}).catch(err => {
-    console.log(err)
-    res.send({
-        success: false
-    })
-})
 })
 router.get('/business/profile', (req, res) => {
 
@@ -161,6 +178,26 @@ router.get('/business/profile', (req, res) => {
         .select()
         .where("status", false)
         .then(profiles => {
+
+            profile = []
+            profiles.map((value) => {
+                profile.push({
+                    "id_business": value.id_business,
+                    "username": value.username,
+                    "name": value.name,
+                    "email": value.email,
+                    "password": value.password,
+                    "business_name": value.business_name,
+                    "target": value.target,
+                    "terkumpul": value.terkumpul,
+                    "domisili": value.domisili,
+                    "description": value.description,
+                    "photo": value.photo,
+                    "status": value.status,
+                    "valuasi": value.valuasi,
+                    "url": "https://igniter.herokuapp.com/uploads/attachments/" + value.photo,
+                })
+            })
 
             knex('investment')
                 .select()
@@ -184,7 +221,7 @@ router.get('/business/profile', (req, res) => {
                     // console.log(invest)
                     res.send({
                         success: true,
-                        profiles, 
+                        profile,
                         invest
                     })
                 }).catch(err => {
@@ -455,6 +492,7 @@ router.post('/business/register', (req, res) => {
     var password = req.body.password
     var email = req.body.email
     var name = req.body.name
+    var valuasi = req.body.valuasi
     var domisili = req.body.domisili
     var description = req.body.description
     var business_name = req.body.business_name
@@ -468,11 +506,16 @@ router.post('/business/register', (req, res) => {
         .then(data => {
             if (data.length === 0) {
                 knex('business')
-                    .insert({ username, name, email, password, domisili, business_name, description, status })
+                    .insert({ username, name, email, password, domisili, business_name, description, status, valuasi })
                     .then((newUserId) => {
-                        res.send({
-                            success: true,
-                            id: newUserId
+                        knex('business').select().where('username', username).then(data => {
+
+                            res.status(200).send({
+                                success: true,
+                                id:data[0].id_business,
+                                name:data[0].name,
+                                username:data[0].username
+                            })
                         })
                     })
             } else {
@@ -658,7 +701,7 @@ router.post('/business/profile/addDocumentation', (req, res) => {
     }
 })
 
-router.post('business/profile/uploadHeader/:id_business', (req, res) => {
+router.post('/business/profile/uploadHeader/:id_business', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         res.status(400).send({
             success: false,
@@ -793,6 +836,7 @@ router.delete('/business/profile/deleteDoc/:id_documentation', (req, res) => {
         .where('id_documentation', id_documentation)
         .update({ deleted })
         .then((newData) => {
+            v
             res.send({
                 success: true,
                 data: newData
