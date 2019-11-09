@@ -82,6 +82,7 @@ router.get('/business/profile/:id_business', (req, res) => {
                     knex('track_record')
                         .select()
                         .where("id_business", id_business)
+                        .andWhere('deleted', false)
                         .then(tracks => {
 
                             arrMonth = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
@@ -113,6 +114,7 @@ router.get('/business/profile/:id_business', (req, res) => {
                                     knex('investment')
                                         .select()
                                         .where("id_business", id_business)
+                                        .andWhere('deleted', false)
                                         .then(investments => {
                                             // console.log(profile)
                                             // console.log(docs)
