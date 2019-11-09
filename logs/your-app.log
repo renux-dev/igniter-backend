@@ -26,3 +26,4 @@
 {"level":"error"}
 {"level":"error"}
 {"level":"error"}
+{"errno":"ECONNRESET","code":"ECONNRESET","syscall":"read","fatal":true,"level":"error"}

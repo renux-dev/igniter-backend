@@ -75,14 +75,13 @@ router.get('/business/profile/:id_business', (req, res) => {
                             "id_documentation": value.id_documentation,
                             "photo": value.photo,
                             "deleted": value.deleted,
-                            "url": "https://igniter.herokuapp.com/uploads/attachments/" + value.photo
+                            "url": "https://igniter.herokuapp.com/uploads/documentations/" + value.photo
                         })
                     })
 
                     knex('track_record')
                         .select()
                         .where("id_business", id_business)
-                        .andWhere('deleted', false)
                         .then(tracks => {
 
                             arrMonth = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
@@ -114,7 +113,6 @@ router.get('/business/profile/:id_business', (req, res) => {
                                     knex('investment')
                                         .select()
                                         .where("id_business", id_business)
-                                        .andWhere('deleted', false)
                                         .then(investments => {
                                             // console.log(profile)
                                             // console.log(docs)
@@ -195,7 +193,7 @@ router.get('/business/profile', (req, res) => {
                     "photo": value.photo,
                     "status": value.status,
                     "valuasi": value.valuasi,
-                    "url": "https://igniter.herokuapp.com/uploads/attachments/" + value.photo,
+                    "url": "https://igniter.herokuapp.com/uploads/header/" + value.photo,
                 })
             })
 
