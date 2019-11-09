@@ -381,7 +381,9 @@ router.post('/user/register', (req, res) => {
 
                             res.status(200).send({
                                 success: true,
-                                id: idUser
+                                id: idUser,
+                                name: data3[0].name,
+                                email: data3[0].email
                             })
                         })
                     }).catch(err => {
