@@ -560,7 +560,7 @@ router.post('/business/register', (req, res) => {
                         })
                     })
             } else {
-                res.status(404).send({
+                res.status(409).send({
                     success: false,
                     message: "EMAIL or USERNAME already taken !"
                 })
@@ -620,7 +620,7 @@ router.put('/business/profile/updateDescription/', (req, res) => {
         }).catch(err => {
             console.log(err)
             log.error(err)
-            res.status(404).send({
+            res.status(400).send({
                 success: false
             })
         })
@@ -639,7 +639,7 @@ router.post('/business/profile/insertTarget', (req, res) => {
                 id: newData[0]
             })
         }).catch(err => {
-            res.status(404).send({
+            res.status(400).send({
                 success: false
             })
             console.log(err)
@@ -664,7 +664,7 @@ router.post('/business/profile/addRecord', (req, res) => {
         }).catch(err => {
             console.log(err)
             log.error(err)
-            res.status(404).send({
+            res.status(400).send({
                 success: false
             })
         })
@@ -686,7 +686,7 @@ router.put('/business/profile/updateRecord/', (req, res) => {
                 id: newData[0]
             })
         }).catch(err => {
-            res.status(404).send({
+            res.status(400).send({
                 success: false
             })
             console.log(err)
@@ -695,7 +695,7 @@ router.put('/business/profile/updateRecord/', (req, res) => {
 
 router.post('/business/profile/addDocumentation', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
-        res.status(404).send({
+        res.status(400).send({
             success: false,
             message: "File not found !"
         });
@@ -735,7 +735,7 @@ router.post('/business/profile/addDocumentation', (req, res) => {
             }
         })
     } else {
-        res.status(404).send({
+        res.status(400).send({
             status: false,
             message: "Incorrect file format !"
         })
@@ -773,7 +773,7 @@ router.post('/business/profile/uploadHeader/:id_business', (req, res) => {
                         })
                     }).catch(err => {
                         console.log(err)
-                        res.send({
+                        res.status(400).send({
                             status: false,
                             msg: "SALAH EGE UPLOADNYA"
                         })
@@ -781,7 +781,7 @@ router.post('/business/profile/uploadHeader/:id_business', (req, res) => {
             }
         })
     } else {
-        res.status(404).send({
+        res.status(400).send({
             status: false,
             message: "Incorrect file format !"
         })
@@ -819,7 +819,7 @@ router.post('/business/profile/uploadAttach', (req, res) => {
                     })
                 }).catch(err => {
                     console.log(err)
-                    res.send({
+                    res.status(404).send({
                         status: false,
                         msg: "SALAH EGE UPLOADNYA"
                     })
