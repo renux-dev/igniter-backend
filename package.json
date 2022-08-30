@@ -22,7 +22,7 @@
     "fuzzylogic": "^0.3.5",
     "knex": "^0.19.4",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.27",
+    "moment-timezone": "^0.5.35",
     "mysql": "^2.17.1",
     "nodemon": "^1.19.2",
     "winston": "^3.2.1"
